@@ -1,0 +1,19 @@
+# Environment variables (NEVER commit these)
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
