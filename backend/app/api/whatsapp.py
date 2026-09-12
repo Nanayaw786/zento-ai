@@ -31,6 +31,8 @@ def verify_webhook(
 @router.post("/whatsapp")
 async def receive_message(request: Request, db: Session = Depends(get_db)):
     payload = await request.json()
+    print("=== WEBHOOK PAYLOAD RECEIVED ===", flush=True)
+    print(payload, flush=True)
 
     try:
         entry = payload["entry"][0]
@@ -39,24 +41,31 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
         messages = value.get("messages")
 
         if not messages:
+            print("No 'messages' key found, ignoring.", flush=True)
             return {"status": "ignored"}
 
         message = messages[0]
         from_number = message["from"]
         message_text = message.get("text", {}).get("body", "")
 
+        print(f"From: {from_number}, Text: {message_text}", flush=True)
+
         if not message_text:
+            print("Empty message text, ignoring.", flush=True)
             return {"status": "ignored"}
 
+        print(f"Running agent for business_id: {LINKED_BUSINESS_ID}", flush=True)
         reply_text = run_agent(
             db=db,
             business_id=uuid.UUID(LINKED_BUSINESS_ID),
             message=message_text,
         )
+        print(f"Agent reply: {reply_text}", flush=True)
 
-        send_whatsapp_message(to=from_number, message=reply_text)
+        send_result = send_whatsapp_message(to=from_number, message=reply_text)
+        print(f"Send result: {send_result}", flush=True)
 
-    except (KeyError, IndexError):
-        pass
+    except Exception as e:
+        print(f"WEBHOOK ERROR: {type(e).__name__}: {e}", flush=True)
 
     return {"status": "received"}
