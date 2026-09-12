@@ -14,4 +14,5 @@ class Business(Base):
     password_hash = Column(String, nullable=True)
     phone = Column(String, nullable=True)
     business_type = Column(String, nullable=True)
+    whatsapp_phone_number_id = Column(String, nullable=True, unique=True)
     created_at = Column(DateTime, default=datetime.utcnow)

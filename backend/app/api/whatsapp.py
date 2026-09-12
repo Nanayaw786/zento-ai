@@ -8,13 +8,13 @@ from dotenv import load_dotenv
 from app.core.database import get_db
 from app.api.agent import run_agent
 from app.agents.whatsapp_client import send_whatsapp_message
+from app.models.business import Business
 
 load_dotenv()
 
 router = APIRouter(prefix="/webhook", tags=["webhook"])
 
 VERIFY_TOKEN = os.getenv("WHATSAPP_VERIFY_TOKEN")
-LINKED_BUSINESS_ID = os.getenv("WHATSAPP_LINKED_BUSINESS_ID")
 
 
 @router.get("/whatsapp")
@@ -44,20 +44,31 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
             print("No 'messages' key found, ignoring.", flush=True)
             return {"status": "ignored"}
 
+        receiving_phone_number_id = value["metadata"]["phone_number_id"]
         message = messages[0]
         from_number = message["from"]
         message_text = message.get("text", {}).get("body", "")
 
+        print(f"Receiving number ID: {receiving_phone_number_id}", flush=True)
         print(f"From: {from_number}, Text: {message_text}", flush=True)
 
         if not message_text:
             print("Empty message text, ignoring.", flush=True)
             return {"status": "ignored"}
 
-        print(f"Running agent for business_id: {LINKED_BUSINESS_ID}", flush=True)
+        business = db.query(Business).filter(
+            Business.whatsapp_phone_number_id == receiving_phone_number_id
+        ).first()
+
+        if not business:
+            print(f"No business found for phone_number_id {receiving_phone_number_id}, ignoring.", flush=True)
+            return {"status": "no_business_found"}
+
+        print(f"Routed to business: {business.name} ({business.id})", flush=True)
+
         reply_text = run_agent(
             db=db,
-            business_id=uuid.UUID(LINKED_BUSINESS_ID),
+            business_id=business.id,
             message=message_text,
         )
         print(f"Agent reply: {reply_text}", flush=True)
