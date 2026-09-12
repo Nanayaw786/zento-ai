@@ -73,7 +73,11 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
         )
         print(f"Agent reply: {reply_text}", flush=True)
 
-        send_result = send_whatsapp_message(to=from_number, message=reply_text)
+        send_result = send_whatsapp_message(
+            to=from_number,
+            message=reply_text,
+            from_phone_number_id=receiving_phone_number_id,
+        )
         print(f"Send result: {send_result}", flush=True)
 
     except Exception as e:

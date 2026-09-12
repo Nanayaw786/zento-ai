@@ -131,7 +131,7 @@ def send_notification(db: Session, business_id: uuid.UUID, message: str) -> dict
     whatsapp_sent = False
     if business and business.phone:
         try:
-            result = send_whatsapp_message(to=business.phone, message=f"[Zento AI] {message}")
+            result = send_whatsapp_message(to=business.phone, message=f"[Zento AI] {message}", from_phone_number_id=business.whatsapp_phone_number_id)
             print("WhatsApp send result:", result)
             whatsapp_sent = True
         except Exception as e:
@@ -272,4 +272,5 @@ def create_invoice(db: Session, business_id: uuid.UUID, order_id: str) -> dict:
         "amount": str(invoice.amount),
         "status": invoice.status,
     }
+
 
