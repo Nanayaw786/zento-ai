@@ -258,3 +258,13 @@ export async function getAdminBusinesses(token: string) {
   if (!res.ok) throw new Error("Failed to fetch businesses");
   return res.json();
 }
+
+export async function requestWhatsAppNumber(businessId: string, number: string) {
+  const res = await fetch(`${API_BASE_URL}/businesses/${businessId}/whatsapp-request`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ whatsapp_requested_number: number }),
+  });
+  if (!res.ok) throw new Error("Failed to submit WhatsApp number request");
+  return res.json();
+}

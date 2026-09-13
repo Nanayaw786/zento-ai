@@ -11,6 +11,7 @@ type Stats = {
   total_appointments: number;
   total_conversations: number;
   businesses_with_whatsapp: number;
+  pending_whatsapp_requests: number;
 };
 
 type BusinessRow = {
@@ -20,6 +21,8 @@ type BusinessRow = {
   business_type: string | null;
   phone: string | null;
   whatsapp_connected: boolean;
+  whatsapp_requested_number: string | null;
+  whatsapp_request_status: string | null;
   order_count: number;
   customer_count: number;
   created_at: string;
@@ -29,7 +32,6 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [businesses, setBusinesses] = useState<BusinessRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -56,6 +58,8 @@ export default function AdminDashboardPage() {
     router.push("/admin");
   };
 
+  const pendingRequests = businesses.filter((b) => b.whatsapp_request_status === "pending");
+
   if (loading) return <div className="min-h-screen bg-zento-surface" />;
 
   return (
@@ -71,23 +75,59 @@ export default function AdminDashboardPage() {
           </button>
         </div>
 
-        {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
-
         {stats && (
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-3 md:grid-cols-7 gap-4 mb-8">
             {[
               { label: "Businesses", value: stats.total_businesses },
               { label: "With WhatsApp", value: stats.businesses_with_whatsapp },
+              { label: "Pending Requests", value: stats.pending_whatsapp_requests, highlight: stats.pending_whatsapp_requests > 0 },
               { label: "Customers", value: stats.total_customers },
               { label: "Orders", value: stats.total_orders },
               { label: "Appointments", value: stats.total_appointments },
               { label: "Conversations", value: stats.total_conversations },
             ].map((s) => (
-              <div key={s.label} className="bg-white rounded-2xl border border-black/5 p-4">
+              <div
+                key={s.label}
+                className={`rounded-2xl border p-4 ${
+                  s.highlight ? "bg-zento-gold/10 border-zento-gold/30" : "bg-white border-black/5"
+                }`}
+              >
                 <p className="text-black/50 text-xs mb-1">{s.label}</p>
-                <p className="text-zento-navy text-2xl font-medium">{s.value}</p>
+                <p className={`text-2xl font-medium ${s.highlight ? "text-zento-gold-dark" : "text-zento-navy"}`}>
+                  {s.value}
+                </p>
               </div>
             ))}
+          </div>
+        )}
+
+        {pendingRequests.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-sm font-medium text-zento-navy mb-3">
+              Pending WhatsApp Number Requests
+            </h2>
+            <div className="bg-white rounded-2xl border border-zento-gold/30 overflow-hidden">
+              <table className="w-full text-sm text-left">
+                <thead>
+                  <tr className="border-b border-black/5 text-black/50">
+                    <th className="px-5 py-3 font-medium">Business</th>
+                    <th className="px-5 py-3 font-medium">Email</th>
+                    <th className="px-5 py-3 font-medium">Requested Number</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingRequests.map((b) => (
+                    <tr key={b.id} className="border-b border-black/5 last:border-0">
+                      <td className="px-5 py-3 text-zento-navy font-medium">{b.name}</td>
+                      <td className="px-5 py-3 text-black/70">{b.email}</td>
+                      <td className="px-5 py-3 text-black/70 font-medium">
+                        {b.whatsapp_requested_number}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -116,10 +156,16 @@ export default function AdminDashboardPage() {
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
                         b.whatsapp_connected
                           ? "bg-green-100 text-green-700"
+                          : b.whatsapp_request_status === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
                           : "bg-gray-100 text-gray-600"
                       }`}
                     >
-                      {b.whatsapp_connected ? "Connected" : "Not connected"}
+                      {b.whatsapp_connected
+                        ? "Connected"
+                        : b.whatsapp_request_status === "pending"
+                        ? "Pending"
+                        : "Not connected"}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-black/70">{b.customer_count}</td>

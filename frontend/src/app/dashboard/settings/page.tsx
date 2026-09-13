@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { getBusiness, updateBusiness } from "@/lib/api";
+import { getBusiness, updateBusiness, requestWhatsAppNumber } from "@/lib/api";
 
 type Business = {
   id: string;
@@ -10,6 +10,9 @@ type Business = {
   email: string;
   phone: string | null;
   business_type: string | null;
+  whatsapp_phone_number_id: string | null;
+  whatsapp_requested_number: string | null;
+  whatsapp_request_status: string | null;
 };
 
 export default function SettingsPage() {
@@ -23,8 +26,11 @@ export default function SettingsPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [businessType, setBusinessType] = useState("");
+  const [waNumber, setWaNumber] = useState("");
+  const [waSaving, setWaSaving] = useState(false);
+  const [waSuccess, setWaSuccess] = useState(false);
 
-  useEffect(() => {
+  const loadBusiness = () => {
     if (!businessId) return;
     getBusiness(businessId)
       .then((data) => {
@@ -35,6 +41,11 @@ export default function SettingsPage() {
       })
       .catch(() => setError("Could not load business settings."))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadBusiness();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,6 +65,22 @@ export default function SettingsPage() {
       setError("Could not save changes.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleWaRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!businessId || !waNumber.trim()) return;
+    setWaSaving(true);
+    setWaSuccess(false);
+    try {
+      await requestWhatsAppNumber(businessId, waNumber.trim());
+      setWaSuccess(true);
+      loadBusiness();
+    } catch {
+      setError("Could not submit WhatsApp number request.");
+    } finally {
+      setWaSaving(false);
     }
   };
 
@@ -94,7 +121,7 @@ export default function SettingsPage() {
             </label>
             <input
               type="text"
-              placeholder="+233 24 000 0000"
+              placeholder="233240000000"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-zento-navy/20"
@@ -146,15 +173,50 @@ export default function SettingsPage() {
 
       <div className="bg-white rounded-2xl border border-black/5 p-6">
         <h3 className="text-sm font-medium text-zento-navy mb-4">WhatsApp Connection</h3>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-yellow-500" />
-          <p className="text-sm text-black/60">
-            Connected to a shared test number (development mode)
-          </p>
-        </div>
-        <p className="text-black/40 text-xs mt-2">
-          Each business will get its own dedicated WhatsApp number once Zento AI is in production.
-        </p>
+
+        {business?.whatsapp_phone_number_id ? (
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500" />
+            <p className="text-sm text-black/60">
+              Your WhatsApp number is connected and active.
+            </p>
+          </div>
+        ) : business?.whatsapp_request_status === "pending" ? (
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-yellow-500" />
+            <p className="text-sm text-black/60">
+              Request submitted for {business.whatsapp_requested_number} — our team will connect it shortly.
+            </p>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-black/60 mb-3">
+              No WhatsApp number connected yet. Enter the number you&apos;d like your customers to message.
+            </p>
+            {waSuccess && (
+              <p className="text-green-700 text-sm mb-3 bg-green-50 px-3 py-2 rounded-lg">
+                Request submitted. Our team will connect this number shortly.
+              </p>
+            )}
+            <form onSubmit={handleWaRequest} className="flex gap-3">
+              <input
+                type="text"
+                required
+                placeholder="e.g. 233240000000"
+                value={waNumber}
+                onChange={(e) => setWaNumber(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-zento-navy/20"
+              />
+              <button
+                type="submit"
+                disabled={waSaving}
+                className="text-sm font-medium text-white bg-zento-navy px-4 py-2 rounded-lg hover:bg-zento-navy-light transition-colors disabled:opacity-50"
+              >
+                {waSaving ? "Submitting..." : "Request"}
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </div>
   );
