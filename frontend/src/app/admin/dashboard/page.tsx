@@ -67,7 +67,7 @@ export default function AdminDashboardPage() {
     <div className="min-h-screen bg-zento-surface p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-xl font-medium text-zento-navy">Zento AI ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Platform Admin</h1>
+          <h1 className="text-xl font-medium text-zento-navy">Zento AI - Platform Admin</h1>
           <button
             onClick={handleLogout}
             className="text-sm text-black/50 hover:text-black/80"
