@@ -67,7 +67,7 @@ export default function AdminDashboardPage() {
     <div className="min-h-screen bg-zento-surface p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-xl font-medium text-zento-navy">Zento AI Ã¢â‚¬â€ Platform Admin</h1>
+          <h1 className="text-xl font-medium text-zento-navy">Zento AI ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Platform Admin</h1>
           <button
             onClick={handleLogout}
             className="text-sm text-black/50 hover:text-black/80"
@@ -151,7 +151,7 @@ export default function AdminDashboardPage() {
                 <tr key={b.id} className="border-b border-black/5 last:border-0">
                   <td className="px-5 py-3 text-zento-navy font-medium">{b.name}</td>
                   <td className="px-5 py-3 text-black/70">{b.email}</td>
-                  <td className="px-5 py-3 text-black/70">{b.business_type ?? "Ã¢â‚¬â€"}</td>
+                  <td className="px-5 py-3 text-black/70">{b.business_type ?? "N/A"}</td>
                   <td className="px-5 py-3">
                     <div className="flex flex-col gap-1">
                       <span

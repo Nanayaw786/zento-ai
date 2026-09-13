@@ -21,8 +21,8 @@ export default function DashboardPage() {
   }, [businessId]);
 
   const stats = [
-    { label: "Total orders", value: loading ? "—" : String(ordersCount) },
-    { label: "Total conversations", value: loading ? "—" : String(conversationsCount) },
+    { label: "Total orders", value: loading ? "â€”" : String(ordersCount) },
+    { label: "Total conversations", value: loading ? "â€”" : String(conversationsCount) },
     { label: "Revenue today", value: "GHS 0" },
   ];
 

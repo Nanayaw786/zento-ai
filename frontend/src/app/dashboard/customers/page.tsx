@@ -181,8 +181,8 @@ export default function CustomersPage() {
               {customers.map((c) => (
                 <tr key={c.id} className="border-b border-black/5 last:border-0">
                   <td className="px-5 py-3 text-zento-navy font-medium">{c.name}</td>
-                  <td className="px-5 py-3 text-black/70">{c.phone ?? "—"}</td>
-                  <td className="px-5 py-3 text-black/70">{c.email ?? "—"}</td>
+                  <td className="px-5 py-3 text-black/70">{c.phone ?? "â€”"}</td>
+                  <td className="px-5 py-3 text-black/70">{c.email ?? "â€”"}</td>
                   <td className="px-5 py-3 text-right space-x-3">
                     <button
                       onClick={() => startEdit(c)}
