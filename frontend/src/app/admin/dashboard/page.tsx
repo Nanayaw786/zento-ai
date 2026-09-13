@@ -21,6 +21,7 @@ type BusinessRow = {
   business_type: string | null;
   phone: string | null;
   whatsapp_connected: boolean;
+  whatsapp_phone_number_id: string | null;
   whatsapp_requested_number: string | null;
   whatsapp_request_status: string | null;
   order_count: number;
@@ -66,7 +67,7 @@ export default function AdminDashboardPage() {
     <div className="min-h-screen bg-zento-surface p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-xl font-medium text-zento-navy">Zento AI — Platform Admin</h1>
+          <h1 className="text-xl font-medium text-zento-navy">Zento AI Ã¢â‚¬â€ Platform Admin</h1>
           <button
             onClick={handleLogout}
             className="text-sm text-black/50 hover:text-black/80"
@@ -150,23 +151,35 @@ export default function AdminDashboardPage() {
                 <tr key={b.id} className="border-b border-black/5 last:border-0">
                   <td className="px-5 py-3 text-zento-navy font-medium">{b.name}</td>
                   <td className="px-5 py-3 text-black/70">{b.email}</td>
-                  <td className="px-5 py-3 text-black/70">{b.business_type ?? "—"}</td>
+                  <td className="px-5 py-3 text-black/70">{b.business_type ?? "Ã¢â‚¬â€"}</td>
                   <td className="px-5 py-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        b.whatsapp_connected
-                          ? "bg-green-100 text-green-700"
+                    <div className="flex flex-col gap-1">
+                      <span
+                        className={`w-fit px-2 py-1 rounded-full text-xs font-medium ${
+                          b.whatsapp_connected
+                            ? "bg-green-100 text-green-700"
+                            : b.whatsapp_request_status === "pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {b.whatsapp_connected
+                          ? "Connected"
                           : b.whatsapp_request_status === "pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {b.whatsapp_connected
-                        ? "Connected"
-                        : b.whatsapp_request_status === "pending"
-                        ? "Pending"
-                        : "Not connected"}
-                    </span>
+                          ? "Pending"
+                          : "Not connected"}
+                      </span>
+                      {b.whatsapp_connected && (
+                        <span className="text-black/40 text-xs">
+                          ID: {b.whatsapp_phone_number_id}
+                        </span>
+                      )}
+                      {b.whatsapp_request_status === "pending" && b.whatsapp_requested_number && (
+                        <span className="text-black/40 text-xs">
+                          Requested: {b.whatsapp_requested_number}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-5 py-3 text-black/70">{b.customer_count}</td>
                   <td className="px-5 py-3 text-black/70">{b.order_count}</td>
