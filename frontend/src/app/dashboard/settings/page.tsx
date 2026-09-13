@@ -117,7 +117,7 @@ export default function SettingsPage() {
           <div>
             <label className="block text-xs font-medium text-black/60 mb-1">
               Phone number
-              <span className="text-black/40 font-normal"> — used for AI notification alerts</span>
+              <span className="text-black/40 font-normal"> â€” used for AI notification alerts</span>
             </label>
             <input
               type="text"
@@ -185,7 +185,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-yellow-500" />
             <p className="text-sm text-black/60">
-              Request submitted for {business.whatsapp_requested_number} — our team will connect it shortly.
+              Request submitted for {business.whatsapp_requested_number} â€” our team will connect it shortly.
             </p>
           </div>
         ) : (
@@ -193,6 +193,13 @@ export default function SettingsPage() {
             <p className="text-sm text-black/60 mb-3">
               No WhatsApp number connected yet. Enter the number you&apos;d like your customers to message.
             </p>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2 mb-3">
+              <p className="text-xs text-yellow-800">
+                <strong>Important:</strong> This number must NOT currently be active on WhatsApp
+                (personal or business app). It needs to be a fresh number, or one you&apos;re willing
+                to remove from WhatsApp first, since it will be dedicated to your Zento AI assistant.
+              </p>
+            </div>
             {waSuccess && (
               <p className="text-green-700 text-sm mb-3 bg-green-50 px-3 py-2 rounded-lg">
                 Request submitted. Our team will connect this number shortly.
