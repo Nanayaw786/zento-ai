@@ -14,6 +14,7 @@ from app.api.agent import router as agent_router
 from app.api.whatsapp import router as whatsapp_router
 from app.api.invoices import router as invoices_router
 from app.api.notifications import router as notifications_router
+from app.api.admin import router as admin_router
 
 app = FastAPI(title="Zento AI Backend")
 
@@ -36,6 +37,7 @@ app.include_router(agent_router)
 app.include_router(whatsapp_router)
 app.include_router(invoices_router)
 app.include_router(notifications_router)
+app.include_router(admin_router)
 
 
 @app.get("/")
