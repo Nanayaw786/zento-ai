@@ -9,6 +9,8 @@ from app.core.database import get_db
 from app.api.agent import run_agent
 from app.agents.whatsapp_client import send_whatsapp_message
 from app.models.business import Business
+from app.models.customer import Customer
+from app.models.conversation import Conversation
 
 load_dotenv()
 
@@ -26,6 +28,19 @@ def verify_webhook(
     if hub_mode == "subscribe" and hub_verify_token == VERIFY_TOKEN:
         return PlainTextResponse(content=hub_challenge)
     raise HTTPException(status_code=403, detail="Verification failed")
+
+
+def _get_or_create_customer(db: Session, business_id: uuid.UUID, phone: str, name: str = "WhatsApp Customer") -> Customer:
+    customer = db.query(Customer).filter(
+        Customer.business_id == business_id,
+        Customer.phone == phone,
+    ).first()
+    if not customer:
+        customer = Customer(business_id=business_id, name=name, phone=phone)
+        db.add(customer)
+        db.commit()
+        db.refresh(customer)
+    return customer
 
 
 @router.post("/whatsapp")
@@ -48,6 +63,7 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
         message = messages[0]
         from_number = message["from"]
         message_text = message.get("text", {}).get("body", "")
+        sender_name = value.get("contacts", [{}])[0].get("profile", {}).get("name", "WhatsApp Customer")
 
         print(f"Receiving number ID: {receiving_phone_number_id}", flush=True)
         print(f"From: {from_number}, Text: {message_text}", flush=True)
@@ -66,6 +82,8 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
 
         print(f"Routed to business: {business.name} ({business.id})", flush=True)
 
+        customer = _get_or_create_customer(db, business.id, from_number, sender_name)
+
         reply_text = run_agent(
             db=db,
             business_id=business.id,
@@ -79,6 +97,15 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
             from_phone_number_id=receiving_phone_number_id,
         )
         print(f"Send result: {send_result}", flush=True)
+
+        conversation_log = Conversation(
+            business_id=business.id,
+            customer_id=customer.id,
+            last_message=f"Customer: {message_text}\nZento AI: {reply_text}",
+            channel="WhatsApp",
+        )
+        db.add(conversation_log)
+        db.commit()
 
     except Exception as e:
         print(f"WEBHOOK ERROR: {type(e).__name__}: {e}", flush=True)

@@ -15,4 +15,6 @@ class Business(Base):
     phone = Column(String, nullable=True)
     business_type = Column(String, nullable=True)
     whatsapp_phone_number_id = Column(String, nullable=True, unique=True)
+    whatsapp_requested_number = Column(String, nullable=True)
+    whatsapp_request_status = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

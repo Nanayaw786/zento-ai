@@ -41,6 +41,9 @@ def get_platform_stats(db: Session = Depends(get_db), _: bool = Depends(verify_a
         "businesses_with_whatsapp": db.query(func.count(Business.id))
         .filter(Business.whatsapp_phone_number_id.isnot(None))
         .scalar(),
+        "pending_whatsapp_requests": db.query(func.count(Business.id))
+        .filter(Business.whatsapp_request_status == "pending")
+        .scalar(),
     }
 
 
@@ -59,6 +62,8 @@ def list_all_businesses(db: Session = Depends(get_db), _: bool = Depends(verify_
             "phone": b.phone,
             "whatsapp_connected": b.whatsapp_phone_number_id is not None,
             "whatsapp_phone_number_id": b.whatsapp_phone_number_id,
+            "whatsapp_requested_number": b.whatsapp_requested_number,
+            "whatsapp_request_status": b.whatsapp_request_status,
             "order_count": order_count,
             "customer_count": customer_count,
             "created_at": b.created_at.isoformat(),
