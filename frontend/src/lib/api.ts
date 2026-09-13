@@ -230,3 +230,31 @@ export async function updateBusiness(
   if (!res.ok) throw new Error("Failed to update business");
   return res.json();
 }
+
+export async function adminLogin(username: string, password: string) {
+  const res = await fetch(`${API_BASE_URL}/admin/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+  if (!res.ok) {
+    throw new Error("Invalid admin credentials");
+  }
+  return res.json();
+}
+
+export async function getAdminStats(token: string) {
+  const res = await fetch(`${API_BASE_URL}/admin/stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch admin stats");
+  return res.json();
+}
+
+export async function getAdminBusinesses(token: string) {
+  const res = await fetch(`${API_BASE_URL}/admin/businesses`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch businesses");
+  return res.json();
+}
