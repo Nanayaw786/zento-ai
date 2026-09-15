@@ -64,6 +64,8 @@ def list_all_businesses(db: Session = Depends(get_db), _: bool = Depends(verify_
             "whatsapp_phone_number_id": b.whatsapp_phone_number_id,
             "whatsapp_requested_number": b.whatsapp_requested_number,
             "whatsapp_request_status": b.whatsapp_request_status,
+            "plan": b.plan,
+            "requested_plan": b.requested_plan,
             "order_count": order_count,
             "customer_count": customer_count,
             "created_at": b.created_at.isoformat(),

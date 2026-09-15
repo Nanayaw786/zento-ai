@@ -20,6 +20,7 @@ def signup(data: SignupRequest, db: Session = Depends(get_db)):
         email=data.email,
         password_hash=hash_password(data.password),
         business_type=data.business_type,
+        requested_plan=data.requested_plan,
     )
     db.add(new_business)
     db.commit()

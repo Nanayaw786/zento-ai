@@ -18,6 +18,7 @@ class Business(Base):
     whatsapp_requested_number = Column(String, nullable=True)
     whatsapp_request_status = Column(String, nullable=True)
     plan = Column(String, nullable=False, default="free")
+    requested_plan = Column(String, nullable=True)
     ai_replies_this_month = Column(Integer, nullable=False, default=0)
     usage_reset_month = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
