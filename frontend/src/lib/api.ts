@@ -147,6 +147,7 @@ export async function signup(data: {
   email: string;
   password: string;
   business_type?: string;
+  requested_plan?: string;
 }) {
   const res = await fetch(`${API_BASE_URL}/auth/signup`, {
     method: "POST",

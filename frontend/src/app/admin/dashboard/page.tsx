@@ -24,6 +24,8 @@ type BusinessRow = {
   whatsapp_phone_number_id: string | null;
   whatsapp_requested_number: string | null;
   whatsapp_request_status: string | null;
+  plan: string;
+  requested_plan: string | null;
   order_count: number;
   customer_count: number;
   created_at: string;
@@ -143,6 +145,7 @@ export default function AdminDashboardPage() {
                 <th className="px-5 py-3 font-medium">WhatsApp</th>
                 <th className="px-5 py-3 font-medium">Customers</th>
                 <th className="px-5 py-3 font-medium">Orders</th>
+                <th className="px-5 py-3 font-medium">Plan</th>
                 <th className="px-5 py-3 font-medium">Joined</th>
               </tr>
             </thead>
@@ -183,6 +186,16 @@ export default function AdminDashboardPage() {
                   </td>
                   <td className="px-5 py-3 text-black/70">{b.customer_count}</td>
                   <td className="px-5 py-3 text-black/70">{b.order_count}</td>
+                  <td className="px-5 py-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-black/70 text-xs capitalize">{b.plan}</span>
+                      {b.requested_plan && b.requested_plan !== b.plan && (
+                        <span className="text-zento-gold-dark text-xs capitalize">
+                          Wants: {b.requested_plan}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-5 py-3 text-black/50">
                     {new Date(b.created_at).toLocaleDateString()}
                   </td>

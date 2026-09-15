@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signup } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
-export default function SignupPage() {
+function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,14 +14,24 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setAuth } = useAuth();
+
+  const requestedPlan = searchParams.get("plan");
+  const planLabel =
+    requestedPlan === "growth" ? "Growth" : requestedPlan === "pro" ? "Pro" : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      const result = await signup({ name, email, password });
+      const result = await signup({
+        name,
+        email,
+        password,
+        requested_plan: requestedPlan ?? undefined,
+      });
       setAuth({
         token: result.access_token,
         businessId: result.business_id,
@@ -36,92 +46,107 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-zento-surface flex items-center justify-center px-6">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <span className="text-zento-navy text-lg font-medium">Zento AI</span>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-black/5 p-8">
-          <h1 className="text-zento-navy text-xl font-medium mb-1">Create your account</h1>
-          <p className="text-black/50 text-sm mb-6">Set up Zento AI for your business</p>
-
-          {error && (
-            <p className="text-red-600 text-sm mb-4 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
-          )}
-
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-xs font-medium text-black/60 mb-1">Business name</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Acme Restaurant"
-                className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-zento-navy/20"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-black/60 mb-1">Email</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@business.com"
-                className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-zento-navy/20"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-black/60 mb-1">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  minLength={8}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-3 py-2 pr-10 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-zento-navy/20"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-black/40 hover:text-black/70 transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full text-sm font-medium text-zento-gold-dark bg-zento-gold py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {loading ? "Creating account..." : "Create account"}
-            </button>
-          </form>
-
-          <p className="text-center text-sm text-black/50 mt-6">
-            Already have an account?{" "}
-            <Link href="/login" className="text-zento-navy font-medium">
-              Sign in
-            </Link>
-          </p>
-        </div>
+    <div className="w-full max-w-sm">
+      <div className="text-center mb-8">
+        <span className="text-zento-navy text-lg font-medium">Zento AI</span>
       </div>
+
+      <div className="bg-white rounded-2xl border border-black/5 p-8">
+        <h1 className="text-zento-navy text-xl font-medium mb-1">Create your account</h1>
+        <p className="text-black/50 text-sm mb-2">Set up Zento AI for your business</p>
+
+        {planLabel && (
+          <p className="text-xs text-zento-gold-dark bg-zento-gold/10 px-3 py-2 rounded-lg mb-4">
+            Signing up for the <strong>{planLabel}</strong> plan. We&apos;ll follow up to
+            activate it once your account is created.
+          </p>
+        )}
+
+        {error && (
+          <p className="text-red-600 text-sm mb-4 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label className="block text-xs font-medium text-black/60 mb-1">Business name</label>
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Acme Restaurant"
+              className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-zento-navy/20"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-black/60 mb-1">Email</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@business.com"
+              className="w-full px-3 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-zento-navy/20"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-black/60 mb-1">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-3 py-2 pr-10 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-zento-navy/20"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-black/40 hover:text-black/70 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full text-sm font-medium text-zento-gold-dark bg-zento-gold py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {loading ? "Creating account..." : "Create account"}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-black/50 mt-6">
+          Already have an account?{" "}
+          <Link href="/login" className="text-zento-navy font-medium">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <main className="min-h-screen bg-zento-surface flex items-center justify-center px-6">
+      <Suspense fallback={<div className="w-full max-w-sm" />}>
+        <SignupForm />
+      </Suspense>
     </main>
   );
 }
