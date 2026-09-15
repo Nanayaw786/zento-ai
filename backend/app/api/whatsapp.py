@@ -11,6 +11,7 @@ from app.agents.whatsapp_client import send_whatsapp_message
 from app.models.business import Business
 from app.models.customer import Customer
 from app.models.conversation import Conversation
+from app.core.usage_limits import check_and_increment_usage
 
 load_dotenv()
 
@@ -81,6 +82,16 @@ async def receive_message(request: Request, db: Session = Depends(get_db)):
             return {"status": "no_business_found"}
 
         print(f"Routed to business: {business.name} ({business.id})", flush=True)
+
+        allowed, limit_message = check_and_increment_usage(db, business)
+        if not allowed:
+            print(f"Usage limit reached for {business.name}, sending upgrade message.", flush=True)
+            send_whatsapp_message(
+                to=from_number,
+                message=limit_message,
+                from_phone_number_id=receiving_phone_number_id,
+            )
+            return {"status": "limit_reached"}
 
         customer = _get_or_create_customer(db, business.id, from_number, sender_name)
 

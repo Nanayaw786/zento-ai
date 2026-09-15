@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from app.core.database import Base
 
@@ -17,4 +17,7 @@ class Business(Base):
     whatsapp_phone_number_id = Column(String, nullable=True, unique=True)
     whatsapp_requested_number = Column(String, nullable=True)
     whatsapp_request_status = Column(String, nullable=True)
+    plan = Column(String, nullable=False, default="free")
+    ai_replies_this_month = Column(Integer, nullable=False, default=0)
+    usage_reset_month = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
