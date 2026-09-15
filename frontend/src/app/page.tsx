@@ -14,7 +14,7 @@ const businessTypes = [
 const flowSteps = [
   {
     title: "A customer messages you",
-    body: "On WhatsApp, any hour, about anything — a menu question, a booking, an order.",
+    body: "On WhatsApp, any hour, about anything â€” a menu question, a booking, an order.",
   },
   {
     title: "Zento AI answers and acts",
@@ -49,7 +49,7 @@ export default function Home() {
       <section className="hero-gradient relative">
         <nav className="flex items-center justify-between px-6 md:px-10 py-6 max-w-6xl mx-auto relative z-10">
           <span className="text-white text-lg font-medium">Zento AI</span>
-          <Link
+          <Link href="/pricing" className="text-sm font-medium text-white/80 hover:text-white transition-colors mr-4">Pricing</Link><Link
             href="/login"
             className="text-sm font-medium text-white bg-white/10 backdrop-blur px-4 py-2 rounded-lg hover:bg-white/20 transition-colors border border-white/20"
           >
@@ -63,7 +63,7 @@ export default function Home() {
           </h1>
           <p className="text-white/70 text-lg md:text-xl mb-10 max-w-xl mx-auto">
             Zento AI talks to your customers, books appointments, takes orders,
-            and tells you what happened — while you get on with running the place.
+            and tells you what happened â€” while you get on with running the place.
           </p>
           <div className="flex items-center justify-center gap-4 mb-12">
             <Link
@@ -92,7 +92,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How it works — actual sequence, so numbered is justified */}
+      {/* How it works â€” actual sequence, so numbered is justified */}
       <section className="bg-white border-b border-black/5">
         <div className="max-w-6xl mx-auto px-6 md:px-10 py-16">
           <h2 className="text-2xl font-medium text-zento-navy mb-10 max-w-md">
@@ -117,7 +117,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Dashboard mockup — grounds "stay in control" in something real */}
+      {/* Dashboard mockup â€” grounds "stay in control" in something real */}
       <section className="max-w-6xl mx-auto px-6 md:px-10 py-20">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="order-2 md:order-1">
@@ -151,7 +151,7 @@ export default function Home() {
             </h2>
             <p className="text-black/60 mb-4 max-w-md">
               Every conversation, order, and booking your AI handles shows up in
-              your dashboard as it happens — not buried in a chat you have to scroll back through.
+              your dashboard as it happens â€” not buried in a chat you have to scroll back through.
             </p>
             <p className="text-black/60 max-w-md">
               Add your products, check on customers, and get a WhatsApp
